@@ -22,7 +22,6 @@ LETRA [a-zA-Z_]
 "else"	{return ELSE;}
 "int"  {return INT;}
 "float" {return FLOAT;}
-"double" {return DOUBLE;}
 "char"  {return CHAR;} 
 "void" {return VOID;}
 "endif" {return ENDIF;}

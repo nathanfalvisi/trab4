@@ -1,6 +1,6 @@
 #include <string.h>
 #include "tipos.h"
-
+#define tabsimb
 #define MAX 1000
 struct symbol {
 	char nome[50];

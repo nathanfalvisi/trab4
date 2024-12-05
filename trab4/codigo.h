@@ -1,5 +1,6 @@
 #include "semantic.h"
 #include "listacodigo.h"
+#include "tabsimb.h"
 
 int temp=-1;
 int newTemp() {
@@ -72,8 +73,14 @@ void Call_blank(?) {
 }
 
 /* Geração de código para atribuições */
-void Atrib(?) {
-	???
+void Atrib(struct no *atr, struct no exp) {
+	char dest[5], source[5];
+	create_cod(&atr->code);
+	getName(atr->place, dest);
+	getName(exp.place, source);
+	sprintf(instrucao,"\tmove %s, %s\n", dest, source);
+	insert_cod(&atr->code, instrucao);
+	insert_cod(&atr->code, exp.code);
 }
 
 /* Geração de código para carregar constantes */
@@ -87,7 +94,7 @@ void Li(struct no *Exp, int num) {
 }
 
 /* Geração de código para qualquer expressão aritmética referente parâmetros */
-void ExpAri(struct no *Exp, struct no Exp1, struct no Exp2) {
+void ExpAri(struct no *Exp, struct no Exp1, struct no Exp2, char op[4]) {
 	char name_reg1[5];
 	char name_reg2[5];
 	char name_temp[5];
@@ -98,13 +105,48 @@ void ExpAri(struct no *Exp, struct no Exp1, struct no Exp2) {
 	getName(Exp1.place,name_reg1);
 	getName(Exp2.place,name_reg2);
 	getName(Exp->place,name_temp);
-	sprintf(instrucao,"\t add %s,%s,%s\n",name_temp,name_reg1, name_reg2);
+	sprintf(instrucao,"\t %s %s,%s,%s\n",op,name_temp,name_reg1, name_reg2);
 	insert_cod(&Exp->code,instrucao);
 }
 
 /* Geração de código para qualquer expressão relacional referente parâmetros */
-void ExpRel(?) { 
-	???
+void Exp_Rel(struct no *Exp, struct no Exp1, struct no Exp2, char branch[4]){
+	char name_reg1[5];
+	char name_reg2[5];
+	char name_temp[5];
+	Exp->place = newTemp();
+	getName(Exp->place,name_temp);
+	create_cod(&Exp->code);
+	insert_cod(&Exp->code,Exp1.code);
+	insert_cod(&Exp->code,Exp2.code);
+	getName(Exp1.place,name_reg1);
+	getName(Exp2.place,name_reg2);
+	getName(Exp->place,name_temp);
+	sprintf(instrucao,"\tli %s,1\n",name_temp);
+	insert_cod(&Exp->code,instrucao);
+	newLabel();
+	sprintf(instrucao,"\t%s,%s,%s,L%d\n",branch,name_reg1,name_reg2,label);
+	insert_cod(&Exp->code,instrucao);
+	sprintf(instrucao,"\tli %s,0\n",name_temp);
+	insert_cod(&Exp->code,instrucao);
+	sprintf(instrucao,"L%d:\n",label);
+	insert_cod(&Exp->code,instrucao);
+}
+
+void Exp_Log(struct no *Exp, struct no Exp1, struct no Exp2, char logic[4]){
+	char name_reg1[5];
+	char name_reg2[5];
+	char name_temp[5];
+	Exp->place = newTemp();
+	getName(Exp->place,name_temp);
+	create_cod(&Exp->code);
+	insert_cod(&Exp->code,Exp1.code);
+	insert_cod(&Exp->code,Exp2.code);
+	getName(Exp1.place,name_reg1);
+	getName(Exp2.place,name_reg2);
+	getName(Exp->place,name_temp);
+	sprintf(instrucao,"\t%s,%s,%s\n",logic,name_reg1,name_reg2);
+	insert_cod(&Exp->code,instrucao);
 }
 
 /* Geração de código para ifs sem else */
@@ -130,37 +172,6 @@ void DoWhile(?) {
 	???
 }
 
-/*
-void Bgt(struct no *Exp, struct no Exp1, struct no Exp2) {
-	char name_reg1[5];
-	char name_reg2[5];
-	char name_temp[5];
-	Exp->place = newTemp();
-	getName(Exp->place,name_temp);
-	create_cod(&Exp->code);
-	insert_cod(&Exp->code,Exp1.code);
-	insert_cod(&Exp->code,Exp2.code);
-	getName(Exp1.place,name_reg1);
-	getName(Exp2.place,name_reg2);
-	getName(Exp->place,name_temp);
-	sprintf(instrucao,"\tli %s,1\n",name_temp);
-	insert_cod(&Exp->code,instrucao);
-	newLabel();
-	sprintf(instrucao,"\t%s,%s,%s,L%d\n",branch, name_reg1,name_reg2,label);
-	insert_cod(&Exp->code,instrucao);
-	sprintf(instrucao,"\tli %s,0\n",name_temp);
-	insert_cod(&Exp->code,instrucao);
-	sprintf(instrucao,"L%d:\n",label);
-	insert_cod(&Exp->code,instrucao);
-}
 
-int rtd(int t1, int t2){
-	if (t1 == DOUBLE || t2 == DOUBLE)
-	return DOUBLE;
-	if (t1 == FLOAT || t2 == FLOAT)
-	return FLOAT;
-	if (t1 == INT || t2 == INT)
-	return INT;
-	if (t1 == CHAR || t2 == CHAR)
-	return CHAR;
-} */
+
+
