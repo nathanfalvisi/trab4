@@ -3,7 +3,10 @@
 #include "analex.c" 
 #include "codigo.h" 
 /* Funcoes auxiliares podem ser declaradas aqui */
-void verifica_var_declarada(?);
+void verifica_var_declarada(int id);
+void verifica_funcao_declarada(int id);
+void verifica_numero_argumentos(int id, int num_args);
+void verifica_indice_valido(int id, int indice);
 	
 %}
 
@@ -21,7 +24,7 @@ void verifica_var_declarada(?);
 	} id_list;
 }
 
-%token <node> NUM 
+%token <node> NUM
 %token <val> ID 
 %token WHILE
 %token IF 
@@ -78,18 +81,23 @@ Function :
 	;
 	
 FunctionCall :
-    ID '(' ArgList ')' {} /* V declaração, # argumentos. S código*/
-	| ID '(' ')' {} /* V declaração, # argumentos. S código*/
+    ID '(' ArgList ')' {        
+		verifica_funcao_declarada($1);
+        verifica_numero_argumentos($1, $3.tam); 
+        Call(&$$, $1, &$3);} /* V declaração, # argumentos. S código*/
+	| ID '(' ')' {
+        verifica_funcao_declarada($1);
+        Call_blank(&$$, $1);} /* V declaração, # argumentos. S código*/
     ;
     
 ArgList:
-    Exp ',' ArgList {} /* S código e Lista de IDs*/
-    | Exp  {} /* S código e Lista de IDs*/
+    Exp ',' ArgList {?} /* S código e Lista de IDs*/
+    | Exp  {?} /* S código e Lista de IDs*/
     ;
 
 ParamList: 
-    ParamList ',' Type ID  {} /* S Lista de IDs. A Tabela*/
-    | Type ID {} /* S Lista de IDs. A Tabela*/
+    ParamList ',' Type ID  {?} /* S Lista de IDs. A Tabela*/
+    | Type ID {?} /* S Lista de IDs. A Tabela*/
 	; 
 		
 Decls:
@@ -102,12 +110,12 @@ Decl:
 	; 
 	
 IDs :
-	  IDs ',' ID {} /* S Lista de IDs. */
-	| IDs ',' Atribuicao {} /* S Lista de IDs. */
-	| IDs ',' ID '[' NUM ']' {} /* S Lista de IDs. */
-	| ID '[' NUM ']' {} /* S Lista de IDs. */
-	| ID {} /* S Lista de IDs. */
-	| Atribuicao {} /* S Lista de IDs. */
+	  IDs ',' ID {?} /* S Lista de IDs. */
+	| IDs ',' Atribuicao {?} /* S Lista de IDs. */
+	| IDs ',' ID '[' NUM ']' {?} /* S Lista de IDs. */
+	| ID '[' NUM ']' {?} /* S Lista de IDs. */
+	| ID {?} /* S Lista de IDs. */
+	| Atribuicao {?} /* S Lista de IDs. */
 	;
 	
 TypeF :
@@ -122,34 +130,34 @@ Type :
 	;
 			
 Statement_Seq :
-	Statement Statement_Seq {} /* S Codigo. */
+	Statement Statement_Seq {create_cod(&$$.code); insert_cod(&$$.code,$1.code); insert_cod(&$$.code,$2.code);} /* S Codigo. */
 	| Statement { create_cod(&$$.code); insert_cod(&$$.code,$1.code);} /* S Codigo. Exemplo */
 	;
 		
 Statement: 
 	  Atribuicao ';' {verifica_var_declarada($1.place); verifica_tipos_atrib(Tabela[$1.place].tipo, $1.tipo);} /* V declaracao, tipos atribuicao. */
 	| If  /* S código. */
-	| While /* S código. */
-	| DoWhile /* S código. */
+	| While {While(&$$,$3,$5);} /* S código. */
+	| DoWhile {DoWhile(&$$,$3,$5);} /* S código. */
 	| FunctionCall ';'  /* S código. */
 	;
 
 Compound_Stt :
-	  Statement  /* S código. Exemplo resolvido */
-	| '{' Statement_Seq '}' {$$ = $2;}  /* S código. Exemplo resolvido */
+	  Statement {create_cod(&$$.code);insert_cod(&$$.code,$1.code);}/* S código. Exemplo resolvido */
+	| '{' Statement_Seq '}' {create_cod(&$$.code);insert_cod(&$$.code,$1.code);}  /* S código. Exemplo resolvido */
 	;
 		
 If :
-	  IF '(' Exp ')' Compound_Stt ENDIF {If($$,$3,$5);} /* S código. Exemplo */
-	| IF '(' Exp ')' Compound_Stt ELSE Compound_Stt ENDIF {} /* S código. */
+	  IF '(' Exp ')' Compound_Stt ENDIF {atrib(&$$, $1, $3);} /* S código. Exemplo */
+	| IF '(' Exp ')' Compound_Stt ELSE Compound_Stt ENDIF {If(&$$,$3,$5);} /* S código. */
 	;
 
 While:
-	WHILE '(' Exp ')' Compound_Stt  {} /* S código. */
+	WHILE '(' Exp ')' Compound_Stt  {While(&$$,$3,$5);} /* S código. */
 	;
 
 DoWhile:
-	DO Compound_Stt WHILE '(' Exp ')' ';' {} /* S código. */
+	DO Compound_Stt WHILE '(' Exp ')' ';' {DoWhile(&$$,$3,$5);} /* S código. */
 	;
 			
 Atribuicao : ID '[' NUM ']' '=' Exp {$$ = $1.pos} /* V tipo indice. S tipo, place, código. */
@@ -157,7 +165,7 @@ Atribuicao : ID '[' NUM ']' '=' Exp {$$ = $1.pos} /* V tipo indice. S tipo, plac
 	;
 				
 Exp :
-	  Exp '+' Exp {Exp_Ari(&$$, $1, $3, "add");} /* S tipo, cod */
+	  Exp '+' Exp {Exp_Ari(&$$, $1, $3,"add");} /* S tipo, cod */
 	| Exp '-' Exp {Exp_Ari(&$$, $1, $3, "sub");} /* S tipo, cod */
 	| Exp '*' Exp {Exp_Ari(&$$, $1, $3, "mul");} /* S tipo, cod */
 	| Exp '/' Exp {Exp_Ari(&$$, $1, $3, "div");} /* S tipo, cod */
@@ -167,13 +175,21 @@ Exp :
 	| Exp LE Exp {$$.tipo = INT;} /*  S tipo. Não precisa implementar código*/
 	| Exp EQ Exp {$$.tipo = INT;} /*  S tipo. Não precisa implementar código*/
 	| Exp NEQ Exp {$$.tipo = INT;} /*  S tipo. Não precisa implementar código*/
-	| Exp OR Exp {Exp_Log(&$$, $1, $3, "or");} /* S tipo, cod */
-	| Exp AND Exp {Exp_Log(&$$, $1, $3, "and");} /* S tipo, cod */
-	| NOT Exp {$$.tipo = INT;} /*  S tipo. Não precisa implementar código*/
+	| Exp OR Exp {Exp_Log(&$$, $1, $3);} /* S tipo, cod */
+	| Exp AND Exp {Exp_Log(&$$, $1, $3);} /* S tipo, cod */
+	| NOT Exp {$2 = INT;} /*  S tipo. Não precisa implementar código*/
 	| '(' Exp ')' {$$ = $2;} /*  S tipo, cod*/
-	| NUM {Li(&$$, $1.place);} /* S tipo, código */
-	| ID '[' NUM ']' {}  /* V declaracao, indice. S tipo, codigo  */
-	| ID  {$$ = $1.tipo;} /* V declaracao. S tipo, codigo  */
+	| NUM {Li(&$$, $1.place)} /* S tipo, código */
+	| ID '[' NUM ']' {
+		verifica_var_declarada($1);
+        verifica_indice_valido($1, $3);
+        Li(&$$, $3); // Carrega o índice
+        char reg[5];
+        getName($$.place, reg);
+        sprintf(instrucao, "\tadd %s, %s, %d\n", reg, Tabela[$1].nome, $3);
+        insert_cod(&$$.code, instrucao);
+	}  /* V declaracao, indice. S tipo, codigo  */
+	| ID  {create_cod(&$$.code); $$.place = $1;} /* V declaracao. S tipo, codigo  */
 	| STRING {} /* Ignore, não precisa implementar  */
 	;   
 	
@@ -185,6 +201,32 @@ int main(int argc, char **argv) {
 } 
 
 /* Funcoes auxiliares podem ser implementadas aqui */
-void verifica_var_declarada(?){
-	?
+void verifica_var_declarada(int id) {
+    if (Tabela[id].tipo == 0) { 
+        fprintf(stderr, "Erro: Variável %s não foi declarada.\n", Tabela[id].nome);
+        exit(1); 
+    }
 }
+
+void verifica_funcao_declarada(int id) {
+    if (Tabela[id].tipo != FUNCAO) {
+        fprintf(stderr, "Erro: Função %s não foi declarada.\n", Tabela[id].nome);
+        exit(1);
+    }
+}
+
+void verifica_numero_argumentos(int id, int num_args) {
+    if (Tabela[id].tam_arg_list != num_args) {
+        fprintf(stderr, "Erro: Função %s esperava %d argumentos, mas recebeu %d.\n",
+                Tabela[id].nome, Tabela[id].tam_arg_list, num_args);
+        exit(1);
+    }
+}
+
+void verifica_indice_valido(int id, int indice) {
+    if (indice < 0 || indice >= Tabela[id].tamanho) {
+        fprintf(stderr, "Erro: Índice %d fora dos limites do vetor %s.\n", indice, Tabela[id].nome);
+        exit(1);
+    }
+}
+

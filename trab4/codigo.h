@@ -11,6 +11,7 @@ void freeTemp() {
 	temp++;
 }
 int label = 0;
+int label1, label2;
 int newLabel() {
 	return ++label;
 }
@@ -34,13 +35,13 @@ void Funct(struct no* Funct, int Id, struct no Comandos) {
 	insert_cod(&Funct->code,instrucao);
 	insert_cod(&Funct->code,Comandos.code);
 	if (strcmp(nome,"main")==0) {
-		sprintf(instrucao,"\tli $v0,10\n"); //Define exit
+		sprintf(instrucao,"\tli $v0,10\n");
 		insert_cod(&Funct->code,instrucao);
-		sprintf(instrucao,"\tsyscall\n\n"); //Call exit
+		sprintf(instrucao,"\tsyscall\n\n"); 
 		insert_cod(&Funct->code,instrucao);					
 	}
 	else {
-		sprintf(instrucao,"\tjr $ra\n\n"); //Return to previous function
+		sprintf(instrucao,"\tjr $ra\n\n"); 
 		insert_cod(&Funct->code,instrucao);
 
 	}
@@ -60,16 +61,32 @@ void adiciona_argumentos(char **code, int id, struct ids Args){
 }
 
 /* Geração de código para chamada de função */
-void Call(struct no* Call, int Id, struct ids Args) {
-	???
-  	adiciona_argumentos(&Call->code, Id, Args);
-	???
+void Call(struct no* Call, int Id, struct ids* Args) {
+    create_cod(&Call->code);
+    if (Args != NULL) {
+        adiciona_argumentos(&Call->code, Id, *Args); 
+    }
+    sprintf(instrucao, "\tjal %s\n", Tabela[Id].nome);
+    insert_cod(&Call->code, instrucao); 
+    Call->place = newTemp();
+    char reg[5];
+    getName(Call->place, reg);
+    sprintf(instrucao, "\tmove %s, $v0\n", reg);
+    insert_cod(&Call->code, instrucao);
 }
 
 
+
 /* Geração de código para chamada de função sem argumentos */
-void Call_blank(?) {
-	???
+void Call_blank(struct no* Call, int Id) {
+    create_cod(&Call->code);
+    sprintf(instrucao, "\tjal %s\n", Tabela[Id].nome);
+    insert_cod(&Call->code, instrucao);
+    Call->place = newTemp();
+    char reg[5];
+    getName(Call->place, reg);
+    sprintf(instrucao, "\tmove %s, $v0\n", reg);
+    insert_cod(&Call->code, instrucao);
 }
 
 /* Geração de código para atribuições */
@@ -125,7 +142,7 @@ void Exp_Rel(struct no *Exp, struct no Exp1, struct no Exp2, char branch[4]){
 	sprintf(instrucao,"\tli %s,1\n",name_temp);
 	insert_cod(&Exp->code,instrucao);
 	newLabel();
-	sprintf(instrucao,"\t%s,%s,%s,L%d\n",branch,name_reg1,name_reg2,label);
+	sprintf(instrucao,"\t%s,%s,%s,L%d\n",name_reg1,name_reg2,branch,label);
 	insert_cod(&Exp->code,instrucao);
 	sprintf(instrucao,"\tli %s,0\n",name_temp);
 	insert_cod(&Exp->code,instrucao);
@@ -145,15 +162,24 @@ void Exp_Log(struct no *Exp, struct no Exp1, struct no Exp2, char logic[4]){
 	getName(Exp1.place,name_reg1);
 	getName(Exp2.place,name_reg2);
 	getName(Exp->place,name_temp);
-	sprintf(instrucao,"\t%s,%s,%s\n",logic,name_reg1,name_reg2);
+	sprintf(instrucao,"\t%s,%s,%s\n",name_reg1,name_reg2, logic);
 	insert_cod(&Exp->code,instrucao);
 }
 
 /* Geração de código para ifs sem else */
-void If(?)  {  
-	???
+void If(struct no *$$, struct no $3, struct no $5) 
+{  
+  create_cod(&$$->code);
+  
+  strcpy(reg1,get_place($3.place));
+  label1 = newLabel();
+   
+  insert_cod(&$$->code,$3.code); 	
+  sprintf(instrucao,"\tbeq %s,0,L%d\n", reg1,label1);  insert_cod(&$$->code,instrucao);	
+  insert_cod(&$$->code,$5.code); 	
+  sprintf(instrucao,"L%d:", label1); insert_cod(&$$->code,instrucao);	
+  
 }
-
 
 /* Geração de código para ifs com else */
 void IfElse(?) {  
@@ -162,8 +188,22 @@ void IfElse(?) {
 
 
 /* Geração de código para whiles */
-void While(?) {  
-	???
+void While(struct no *$$, struct no $3, struct no $5) 
+{  
+  create_cod(&($$->code)); 
+  
+  strcpy(reg1,get_place($3.place));
+  label1 = newLabel();
+  label2 = newLabel();
+
+  sprintf(instrucao,"L%d:", label1); insert_cod(&($$->code),instrucao);
+  insert_cod(&$$->code,$3.code); 	
+  sprintf(instrucao,"\tbeq %s,0,L%d\n", reg1,label2);  insert_cod(&$$->code,instrucao);	
+  insert_cod(&$$->code,$5.code); 	
+  sprintf(instrucao,"\tj L%d\n", label1);
+  insert_cod(&($$->code),instrucao);	
+  sprintf(instrucao,"L%d:", label2); insert_cod(&$$->code,instrucao);	
+ 
 }
 
 
