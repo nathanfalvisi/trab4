@@ -212,35 +212,18 @@ void While(struct no *While, struct no Exp, struct no Body) {
     char name_cond[5];
     char label_start[8];
     char label_end[8];
-
     create_cod(&While->code);
-
-    // Gerar rótulos para o início e o final do laço
     sprintf(label_start, "L%d", newLabel());
     sprintf(label_end, "L%d", newLabel());
-
-    // Rótulo do início do laço
     sprintf(instrucao, "%s:\n", label_start);
     insert_cod(&While->code, instrucao);
-
-    // Inserir o código da expressão condicional
     insert_cod(&While->code, Exp.code);
-
-    // Obter o nome do registrador condicional
     getName(Exp.place, name_cond);
-
-    // Instrução de salto para o final se a condição for falsa
     sprintf(instrucao, "\tbeq %s, $zero, %s\n", name_cond, label_end);
     insert_cod(&While->code, instrucao);
-
-    // Inserir o código do corpo do laço
     insert_cod(&While->code, Body.code);
-
-    // Retorno ao início do laço
     sprintf(instrucao, "\tj %s\n", label_start);
     insert_cod(&While->code, instrucao);
-
-    // Rótulo do final do laço
     sprintf(instrucao, "%s:\n", label_end);
     insert_cod(&While->code, instrucao);
 }
@@ -263,23 +246,6 @@ void DoWhile(struct no *DoWhile, struct no Body, struct no Exp) {
     sprintf(instrucao, "\tbne %s, $zero, %s\n", name_cond, label_start);
     insert_cod(&DoWhile->code, instrucao);
 }
-
-
-/*
-void If(struct no *$$, struct no $3, struct no $5) 
-{  
-  create_cod(&$$->code);
-  
-  strcpy(reg1,get_place($3.place));
-  label1 = newLabel();
-   
-  insert_cod(&$$->code,$3.code); 	
-  sprintf(instrucao,"\tbeq %s,0,L%d\n", reg1,label1);  insert_cod(&$$->code,instrucao);	
-  insert_cod(&$$->code,$5.code); 	
-  sprintf(instrucao,"L%d:", label1); insert_cod(&$$->code,instrucao);	
-  
-}
-*/
 
 
 

@@ -132,8 +132,7 @@ Statement_Seq :
 	;
 		
 Statement:
-	  Atribuicao ';' {verifica_var_declarada($1.place); verifica_tipos_atrib(Tabela[$1.place].tipo, $1.tipo);} /* V declaracao, tipos atribuicao. */
-	| If  /* S código. */
+	Atribuicao ';' {verifica_var_declarada($1.place); verifica_tipos_atrib(Tabela[$1.place].tipo, $1.tipo);} /* V declaracao, tipos atribuicao. */		| If  /* S código. */
 	| While {} /* S código. */
 	| DoWhile {} /* S código. */
 	| FunctionCall ';'  /* S código. */
