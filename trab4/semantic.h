@@ -107,19 +107,20 @@ union YYSTYPE
 {
 #line 15 "semantic.y"
 
-	struct no{
-		int place;
-		char *code;
-		int tipo;
-	} node;
-	int val;
-	struct ids{
-		int ids[50];
-		int tam;
-		char *code;
-	} id_list;
+		struct no{
+			int place;
+			char *code;
+			int tipo;
+		} node;
+		int val;
+		struct ids{
+			int ids[50];
+			int tam;
+			char *code;
+		} id_list;
+	
 
-#line 123 "semantic.h"
+#line 124 "semantic.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

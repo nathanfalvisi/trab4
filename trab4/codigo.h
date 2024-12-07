@@ -92,14 +92,20 @@ void Call_blank(struct no* Call, int Id) {
 }
 
 /* Geração de código para atribuições */
-void Atrib(struct no *atr, struct no exp) {
-	char destino[5], source[5];
-	create_cod(&atr->code);
-	getName(atr->place, destino);
-	getName(exp.place, source);
-	sprintf(instrucao,"\tmove %s, %s\n", destino, source);
-	insert_cod(&atr->code, instrucao);
-	insert_cod(&atr->code, exp.code);
+char* get_place(int id) {
+    static char reg[10];
+    sprintf(reg, "r%d", id);
+    return reg;
+}
+
+void Atrib(struct no *atr, int id, struct no exp) {
+    create_cod(&atr->code);
+    insert_cod(&atr->code, exp.code);     
+    char reg1[10], reg2[10], instrucao[100];
+    strcpy(reg1, get_place(id));
+    strcpy(reg2, get_place(exp.place));                 
+    sprintf(instrucao, "\tmove %s, %s\n", reg1, reg2);
+    insert_cod(&atr->code, instrucao);     
 }
 
 /* Geração de código para carregar constantes */

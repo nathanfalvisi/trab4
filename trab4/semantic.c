@@ -69,19 +69,20 @@
 /* First part of user prologue.  */
 #line 1 "semantic.y"
  
-/* Para simplificar a notação, S é para sintetizar. A atualizar. V verificar */
-#include "analex.c" 
-#include "codigo.h" 
-#define Funct 4
-/* Funcoes auxiliares podem ser declaradas aqui */
-void verifica_var_declarada(int id);
-void verifica_funcao_declarada(int id);
-void verifica_tipos_atrib(int tipo1, int tipo2);
-void verifica_numero_argumentos(int id, int num_args);
-void verifica_indice_valido(int id, int indice);
+	/* Para simplificar a notação, S é para sintetizar. A atualizar. V verificar */
+	#include "analex.c" 
+	#include "codigo.h" 
+	#define Funct 4
+	/* Funcoes auxiliares podem ser declaradas aqui */
+	void verifica_var_declarada(int id);
+	void verifica_funcao_declarada(int id);
+	void verifica_tipos_atrib(int tipo1, int tipo2);
+	void verifica_numero_argumentos(int id, int num_args);
+	void verifica_indice_valido(int id, int indice);
+		
 	
 
-#line 85 "semantic.c"
+#line 86 "semantic.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -554,12 +555,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    73,    73,    76,    77,    81,    82,    86,    87,    91,
-      92,    96,    97,   101,   102,   106,   110,   111,   112,   113,
-     114,   115,   119,   120,   124,   125,   126,   130,   131,   135,
-     135,   136,   137,   138,   142,   143,   147,   148,   152,   156,
-     159,   160,   164,   165,   166,   167,   168,   169,   170,   171,
-     172,   173,   174,   175,   176,   177,   178,   179,   180,   181
+       0,    73,    73,    76,    77,    81,    82,    86,    91,    98,
+      99,   103,   104,   108,   109,   113,   117,   118,   119,   120,
+     121,   122,   126,   127,   131,   132,   133,   137,   138,   142,
+     143,   147,   151,   155,   158,   159,   163,   164,   168,   172,
+     175,   176,   180,   181,   182,   183,   184,   185,   186,   187,
+     188,   189,   190,   191,   192,   193,   194,   195,   196,   197
 };
 #endif
 
@@ -1217,318 +1218,352 @@ yyreduce:
     {
   case 2: /* ProgL: Prog  */
 #line 73 "semantic.y"
-             { printf("%s",(yyvsp[0].node).code);}
-#line 1222 "semantic.c"
+                     {printf("%s",(yyvsp[0].node).code);}
+#line 1223 "semantic.c"
     break;
 
   case 3: /* Prog: Prog Function  */
 #line 76 "semantic.y"
-                     {create_cod(&(yyval.node).code); insert_cod(&(yyval.node).code,(yyvsp[-1].node).code); insert_cod(&(yyval.node).code,(yyvsp[0].node).code);}
-#line 1228 "semantic.c"
+                             {create_cod(&(yyval.node).code); insert_cod(&(yyval.node).code,(yyvsp[-1].node).code); insert_cod(&(yyval.node).code,(yyvsp[0].node).code);}
+#line 1229 "semantic.c"
+    break;
+
+  case 4: /* Prog: Function  */
+#line 77 "semantic.y"
+                           {}
+#line 1235 "semantic.c"
     break;
 
   case 5: /* Function: TypeF ID '(' ParamList ')' '{' Decls Statement_Seq '}'  */
 #line 81 "semantic.y"
-                                                                {}
-#line 1234 "semantic.c"
+                                                                        {}
+#line 1241 "semantic.c"
     break;
 
   case 6: /* Function: TypeF ID '(' ')' '{' Decls Statement_Seq '}'  */
 #line 82 "semantic.y"
-                                                        {}
-#line 1240 "semantic.c"
+                                                               {}
+#line 1247 "semantic.c"
     break;
 
   case 7: /* FunctionCall: ID '(' ArgList ')'  */
 #line 86 "semantic.y"
-                       {}
-#line 1246 "semantic.c"
+                                   {   
+			verifica_funcao_declarada((yyvsp[-3].val));
+        	verifica_numero_argumentos((yyvsp[-3].val), (yyvsp[-1].id_list).tam);
+        	create_cod(&(yyval.node).code);
+        	insert_cod(&(yyval.node).code, (yyvsp[-1].id_list).code);}
+#line 1257 "semantic.c"
     break;
 
   case 8: /* FunctionCall: ID '(' ')'  */
-#line 87 "semantic.y"
-                     {}
-#line 1252 "semantic.c"
+#line 91 "semantic.y"
+                             {        
+			verifica_funcao_declarada((yyvsp[-2].val));
+        	verifica_numero_argumentos((yyvsp[-2].val), 0);
+        	create_cod(&(yyval.node).code);}
+#line 1266 "semantic.c"
     break;
 
   case 9: /* ArgList: Exp ',' ArgList  */
-#line 91 "semantic.y"
-                    {}
-#line 1258 "semantic.c"
+#line 98 "semantic.y"
+                                {}
+#line 1272 "semantic.c"
     break;
 
   case 10: /* ArgList: Exp  */
-#line 92 "semantic.y"
-           {}
-#line 1264 "semantic.c"
+#line 99 "semantic.y"
+                       {}
+#line 1278 "semantic.c"
     break;
 
   case 11: /* ParamList: ParamList ',' Type ID  */
-#line 96 "semantic.y"
-                           {}
-#line 1270 "semantic.c"
+#line 103 "semantic.y"
+                                       {}
+#line 1284 "semantic.c"
     break;
 
   case 12: /* ParamList: Type ID  */
-#line 97 "semantic.y"
-              {}
-#line 1276 "semantic.c"
+#line 104 "semantic.y"
+                          {}
+#line 1290 "semantic.c"
     break;
 
   case 15: /* Decl: Type IDs  */
-#line 106 "semantic.y"
-                 {for(int i=0; i< (yyvsp[0].id_list).tam; i++) Tabela[(yyvsp[0].id_list).ids[i]].tipo = (yyvsp[-1].val);}
-#line 1282 "semantic.c"
+#line 113 "semantic.y"
+                         {for(int i=0; i< (yyvsp[0].id_list).tam; i++) Tabela[(yyvsp[0].id_list).ids[i]].tipo = (yyvsp[-1].val);}
+#line 1296 "semantic.c"
     break;
 
   case 16: /* IDs: IDs ',' ID  */
-#line 110 "semantic.y"
-                     {}
-#line 1288 "semantic.c"
+#line 117 "semantic.y"
+                           {}
+#line 1302 "semantic.c"
     break;
 
   case 17: /* IDs: IDs ',' Atribuicao  */
-#line 111 "semantic.y"
-                             {}
-#line 1294 "semantic.c"
+#line 118 "semantic.y"
+                                     {}
+#line 1308 "semantic.c"
     break;
 
   case 18: /* IDs: IDs ',' ID '[' NUM ']'  */
-#line 112 "semantic.y"
-                                 {}
-#line 1300 "semantic.c"
+#line 119 "semantic.y"
+                                         {}
+#line 1314 "semantic.c"
     break;
 
   case 19: /* IDs: ID '[' NUM ']'  */
-#line 113 "semantic.y"
-                         {}
-#line 1306 "semantic.c"
+#line 120 "semantic.y"
+                                 {}
+#line 1320 "semantic.c"
     break;
 
   case 20: /* IDs: ID  */
-#line 114 "semantic.y"
-             {}
-#line 1312 "semantic.c"
+#line 121 "semantic.y"
+                     {}
+#line 1326 "semantic.c"
     break;
 
   case 21: /* IDs: Atribuicao  */
-#line 115 "semantic.y"
-                     {}
-#line 1318 "semantic.c"
+#line 122 "semantic.y"
+                             {}
+#line 1332 "semantic.c"
     break;
 
   case 22: /* TypeF: VOID  */
-#line 119 "semantic.y"
-               {(yyval.val) = VOID;}
-#line 1324 "semantic.c"
+#line 126 "semantic.y"
+                     {(yyval.val) = VOID;}
+#line 1338 "semantic.c"
     break;
 
   case 24: /* Type: INT  */
-#line 124 "semantic.y"
-              {(yyval.val) = INT;}
-#line 1330 "semantic.c"
+#line 131 "semantic.y"
+                    {(yyval.val) = INT;}
+#line 1344 "semantic.c"
     break;
 
   case 25: /* Type: CHAR  */
-#line 125 "semantic.y"
-               {(yyval.val) = CHAR;}
-#line 1336 "semantic.c"
+#line 132 "semantic.y"
+                       {(yyval.val) = CHAR;}
+#line 1350 "semantic.c"
     break;
 
   case 26: /* Type: FLOAT  */
-#line 126 "semantic.y"
-                {(yyval.val) = FLOAT;}
-#line 1342 "semantic.c"
+#line 133 "semantic.y"
+                        {(yyval.val) = FLOAT;}
+#line 1356 "semantic.c"
     break;
 
   case 27: /* Statement_Seq: Statement Statement_Seq  */
-#line 130 "semantic.y"
-                                {create_cod(&(yyval.node).code); insert_cod(&(yyval.node).code,(yyvsp[-1].node).code); insert_cod(&(yyval.node).code,(yyvsp[0].node).code);}
-#line 1348 "semantic.c"
+#line 137 "semantic.y"
+                                        {create_cod(&(yyval.node).code); insert_cod(&(yyval.node).code,(yyvsp[-1].node).code); insert_cod(&(yyval.node).code,(yyvsp[0].node).code);}
+#line 1362 "semantic.c"
     break;
 
   case 28: /* Statement_Seq: Statement  */
-#line 131 "semantic.y"
-                    { create_cod(&(yyval.node).code); insert_cod(&(yyval.node).code,(yyvsp[0].node).code);}
-#line 1354 "semantic.c"
+#line 138 "semantic.y"
+                            {create_cod(&(yyval.node).code); insert_cod(&(yyval.node).code,(yyvsp[0].node).code);}
+#line 1368 "semantic.c"
     break;
 
   case 29: /* Statement: Atribuicao ';'  */
-#line 135 "semantic.y"
-                       {verifica_var_declarada((yyvsp[-1].node).place); verifica_tipos_atrib(Tabela[(yyvsp[-1].node).place].tipo, (yyvsp[-1].node).tipo);}
-#line 1360 "semantic.c"
+#line 142 "semantic.y"
+                               {verifica_var_declarada((yyvsp[-1].node).place); verifica_tipos_atrib(Tabela[(yyvsp[-1].node).place].tipo, (yyvsp[-1].node).tipo);}
+#line 1374 "semantic.c"
+    break;
+
+  case 30: /* Statement: If  */
+#line 143 "semantic.y"
+               { 
+        create_cod(&(yyval.node).code); 
+        insert_cod(&(yyval.node).code, (yyvsp[0].node).code);  // Copia o código gerado para o If
+    }
+#line 1383 "semantic.c"
     break;
 
   case 31: /* Statement: While  */
-#line 136 "semantic.y"
-                {}
-#line 1366 "semantic.c"
+#line 147 "semantic.y"
+            { 
+        create_cod(&(yyval.node).code); 
+        insert_cod(&(yyval.node).code, (yyvsp[0].node).code);  // Copia o código gerado para o While
+    }
+#line 1392 "semantic.c"
     break;
 
   case 32: /* Statement: DoWhile  */
-#line 137 "semantic.y"
-                  {}
-#line 1372 "semantic.c"
+#line 151 "semantic.y"
+              { 
+        create_cod(&(yyval.node).code); 
+        insert_cod(&(yyval.node).code, (yyvsp[0].node).code);  // Copia o código gerado para o DoWhile
+    }
+#line 1401 "semantic.c"
+    break;
+
+  case 33: /* Statement: FunctionCall ';'  */
+#line 155 "semantic.y"
+                       {}
+#line 1407 "semantic.c"
     break;
 
   case 34: /* Compound_Stt: Statement  */
-#line 142 "semantic.y"
-                    {}
-#line 1378 "semantic.c"
+#line 158 "semantic.y"
+                          {}
+#line 1413 "semantic.c"
     break;
 
   case 35: /* Compound_Stt: '{' Statement_Seq '}'  */
-#line 143 "semantic.y"
-                                {}
-#line 1384 "semantic.c"
+#line 159 "semantic.y"
+                                        {}
+#line 1419 "semantic.c"
     break;
 
   case 36: /* If: IF '(' Exp ')' Compound_Stt ENDIF  */
-#line 147 "semantic.y"
-                                            {If(&(yyval.node), (yyvsp[-3].node), (yyvsp[-1].node));}
-#line 1390 "semantic.c"
+#line 163 "semantic.y"
+                                                  {If(&(yyval.node), (yyvsp[-3].node), (yyvsp[-1].node));}
+#line 1425 "semantic.c"
     break;
 
   case 37: /* If: IF '(' Exp ')' Compound_Stt ELSE Compound_Stt ENDIF  */
-#line 148 "semantic.y"
-                                                              {IfElse(&(yyval.node),(yyvsp[-5].node),(yyvsp[-3].node),(yyvsp[-1].node));}
-#line 1396 "semantic.c"
+#line 164 "semantic.y"
+                                                                      {IfElse(&(yyval.node),(yyvsp[-5].node),(yyvsp[-3].node),(yyvsp[-1].node));}
+#line 1431 "semantic.c"
     break;
 
   case 38: /* While: WHILE '(' Exp ')' Compound_Stt  */
-#line 152 "semantic.y"
-                                        {}
-#line 1402 "semantic.c"
+#line 168 "semantic.y"
+                                                {While(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node));}
+#line 1437 "semantic.c"
     break;
 
   case 39: /* DoWhile: DO Compound_Stt WHILE '(' Exp ')' ';'  */
-#line 156 "semantic.y"
-                                              {}
-#line 1408 "semantic.c"
+#line 172 "semantic.y"
+                                                      {While(&(yyval.node), (yyvsp[-5].node), (yyvsp[-2].node));}
+#line 1443 "semantic.c"
     break;
 
   case 40: /* Atribuicao: ID '[' NUM ']' '=' Exp  */
-#line 159 "semantic.y"
-                                    {}
-#line 1414 "semantic.c"
+#line 175 "semantic.y"
+                                            {Atrib(&(yyval.node), (yyvsp[-5].val), (yyvsp[0].node));}
+#line 1449 "semantic.c"
     break;
 
   case 41: /* Atribuicao: ID '=' Exp  */
-#line 160 "semantic.y"
-                 {}
-#line 1420 "semantic.c"
+#line 176 "semantic.y"
+                             {Atrib(&(yyval.node), (yyvsp[-2].val), (yyvsp[0].node));}
+#line 1455 "semantic.c"
     break;
 
   case 42: /* Exp: Exp '+' Exp  */
-#line 164 "semantic.y"
-                      {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node),"add");}
-#line 1426 "semantic.c"
+#line 180 "semantic.y"
+                            {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node),"add");}
+#line 1461 "semantic.c"
     break;
 
   case 43: /* Exp: Exp '-' Exp  */
-#line 165 "semantic.y"
-                      {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "sub");}
-#line 1432 "semantic.c"
+#line 181 "semantic.y"
+                              {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "sub");}
+#line 1467 "semantic.c"
     break;
 
   case 44: /* Exp: Exp '*' Exp  */
-#line 166 "semantic.y"
-                      {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "mul");}
-#line 1438 "semantic.c"
+#line 182 "semantic.y"
+                              {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "mul");}
+#line 1473 "semantic.c"
     break;
 
   case 45: /* Exp: Exp '/' Exp  */
-#line 167 "semantic.y"
-                      {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "div");}
-#line 1444 "semantic.c"
+#line 183 "semantic.y"
+                              {Exp_Ari(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "div");}
+#line 1479 "semantic.c"
     break;
 
   case 46: /* Exp: Exp '>' Exp  */
-#line 168 "semantic.y"
-                      {Exp_Rel(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "bgt");}
-#line 1450 "semantic.c"
+#line 184 "semantic.y"
+                              {Exp_Rel(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "bgt");}
+#line 1485 "semantic.c"
     break;
 
   case 47: /* Exp: Exp '<' Exp  */
-#line 169 "semantic.y"
-                      {Exp_Rel(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "blt");}
-#line 1456 "semantic.c"
+#line 185 "semantic.y"
+                              {Exp_Rel(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "blt");}
+#line 1491 "semantic.c"
     break;
 
   case 48: /* Exp: Exp GE Exp  */
-#line 170 "semantic.y"
-                     {(yyval.node).tipo = INT;}
-#line 1462 "semantic.c"
+#line 186 "semantic.y"
+                             {(yyval.node).tipo = INT;}
+#line 1497 "semantic.c"
     break;
 
   case 49: /* Exp: Exp LE Exp  */
-#line 171 "semantic.y"
-                     {(yyval.node).tipo = INT;}
-#line 1468 "semantic.c"
+#line 187 "semantic.y"
+                             {(yyval.node).tipo = INT;}
+#line 1503 "semantic.c"
     break;
 
   case 50: /* Exp: Exp EQ Exp  */
-#line 172 "semantic.y"
-                     {(yyval.node).tipo = INT;}
-#line 1474 "semantic.c"
+#line 188 "semantic.y"
+                             {(yyval.node).tipo = INT;}
+#line 1509 "semantic.c"
     break;
 
   case 51: /* Exp: Exp NEQ Exp  */
-#line 173 "semantic.y"
-                      {(yyval.node).tipo = INT;}
-#line 1480 "semantic.c"
+#line 189 "semantic.y"
+                              {(yyval.node).tipo = INT;}
+#line 1515 "semantic.c"
     break;
 
   case 52: /* Exp: Exp OR Exp  */
-#line 174 "semantic.y"
-                     {Exp_Log(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "or");}
-#line 1486 "semantic.c"
+#line 190 "semantic.y"
+                             {Exp_Log(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "or");}
+#line 1521 "semantic.c"
     break;
 
   case 53: /* Exp: Exp AND Exp  */
-#line 175 "semantic.y"
-                      {Exp_Log(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "and");}
-#line 1492 "semantic.c"
+#line 191 "semantic.y"
+                              {Exp_Log(&(yyval.node), (yyvsp[-2].node), (yyvsp[0].node), "and");}
+#line 1527 "semantic.c"
     break;
 
   case 54: /* Exp: NOT Exp  */
-#line 176 "semantic.y"
-                  {(yyvsp[0].node).tipo = INT;}
-#line 1498 "semantic.c"
+#line 192 "semantic.y"
+                          {(yyvsp[0].node).tipo = INT;}
+#line 1533 "semantic.c"
     break;
 
   case 55: /* Exp: '(' Exp ')'  */
-#line 177 "semantic.y"
-                      {(yyval.node) = (yyvsp[-1].node);}
-#line 1504 "semantic.c"
+#line 193 "semantic.y"
+                              {(yyval.node) = (yyvsp[-1].node);}
+#line 1539 "semantic.c"
     break;
 
   case 56: /* Exp: NUM  */
-#line 178 "semantic.y"
-              {Li(&(yyval.node), (yyvsp[0].node).place);}
-#line 1510 "semantic.c"
+#line 194 "semantic.y"
+                      {Li(&(yyval.node), (yyvsp[0].node).place);}
+#line 1545 "semantic.c"
     break;
 
   case 57: /* Exp: ID '[' NUM ']'  */
-#line 179 "semantic.y"
-                         {}
-#line 1516 "semantic.c"
+#line 195 "semantic.y"
+                                 {}
+#line 1551 "semantic.c"
     break;
 
   case 58: /* Exp: ID  */
-#line 180 "semantic.y"
-              {create_cod(&(yyval.node).code); (yyval.node).place = (yyvsp[0].val);}
-#line 1522 "semantic.c"
+#line 196 "semantic.y"
+                      {create_cod(&(yyval.node).code); (yyval.node).place = (yyvsp[0].val);}
+#line 1557 "semantic.c"
     break;
 
   case 59: /* Exp: STRING  */
-#line 181 "semantic.y"
-                 {}
-#line 1528 "semantic.c"
+#line 197 "semantic.y"
+                         {}
+#line 1563 "semantic.c"
     break;
 
 
-#line 1532 "semantic.c"
+#line 1567 "semantic.c"
 
       default: break;
     }
@@ -1721,46 +1756,46 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 185 "semantic.y"
+#line 201 "semantic.y"
   
-int main(int argc, char **argv) {     
-  yyin = fopen(argv[1],"r");
-  yyparse();      
-} 
+	int main(int argc, char **argv) {     
+	yyin = fopen(argv[1],"r");
+	yyparse();      
+	} 
 
-/* Funcoes auxiliares podem ser implementadas aqui */
-void verifica_var_declarada(int id) {
-    if (Tabela[id].tipo == 0) { 
-        fprintf(stderr, "Erro: Variável %s não foi declarada.\n", Tabela[id].nome);
-        exit(1); 
-    }
-}
+	/* Funcoes auxiliares podem ser implementadas aqui */
+	void verifica_var_declarada(int id) {
+		if (Tabela[id].tipo == 0) { 
+			fprintf(stderr, "Erro: Variável %s não foi declarada.\n", Tabela[id].nome);
+			exit(1); 
+		}
+	}
 
-void verifica_funcao_declarada(int id) {
-    if (Tabela[id].tipo != Funct) {
-        fprintf(stderr, "Erro: Função %s não foi declarada.\n", Tabela[id].nome);
-        exit(1);
-    }
-}
+	void verifica_funcao_declarada(int id) {
+		if (Tabela[id].tipo != Funct) {
+			fprintf(stderr, "Erro: Função %s não foi declarada.\n", Tabela[id].nome);
+			exit(1);
+		}
+	}
 
-void verifica_tipos_atrib(int tipo1, int tipo2) {
-    if (tipo1 != tipo2) {
-        fprintf(stderr, "Erro: Tipos incompatíveis na atribuição.\n");
-        exit(1);
-    }
-}
+	void verifica_tipos_atrib(int tipo1, int tipo2) {
+		if (tipo1 != tipo2) {
+			fprintf(stderr, "Erro: Tipos incompatíveis na atribuição.\n");
+			exit(1);
+		}
+	}
 
-void verifica_numero_argumentos(int id, int num_args) {
-    if (Tabela[id].tam_arg_list != num_args) {
-        fprintf(stderr, "Erro: Função %s esperava %d argumentos, mas recebeu %d.\n",
-                Tabela[id].nome, Tabela[id].tam_arg_list, num_args);
-        exit(1);
-    }
-}
+	void verifica_numero_argumentos(int id, int num_args) {
+		if (Tabela[id].tam_arg_list != num_args) {
+			fprintf(stderr, "Erro: Função %s esperava %d argumentos, mas recebeu %d.\n",
+					Tabela[id].nome, Tabela[id].tam_arg_list, num_args);
+			exit(1);
+		}
+	}
 
-void verifica_indice_valido(int id, int indice) {
-    if (indice < 0 || indice >= Tabela[id].tam) {
-        fprintf(stderr, "Erro: Índice %d fora dos limites do vetor %s.\n", indice, Tabela[id].nome);
-        exit(1);
-    }
-}
+	void verifica_indice_valido(int id, int indice) {
+		if (indice < 0 || indice >= Tabela[id].tam) {
+			fprintf(stderr, "Erro: Índice %d fora dos limites do vetor %s.\n", indice, Tabela[id].nome);
+			exit(1);
+		}
+	}
