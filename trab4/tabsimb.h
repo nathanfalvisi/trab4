@@ -47,6 +47,10 @@ int set_type(int pos, int tipo){
 	return 1;
 }
 
+int getTipo(int pos) 
+{
+    return Tabela[pos].tipo;
+}
 
 char nome[50];
 char *obtemNome(int pos) {

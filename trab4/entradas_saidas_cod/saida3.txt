@@ -1,0 +1,1 @@
+Erro Semântico, var não declarada na linha 3

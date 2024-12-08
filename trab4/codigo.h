@@ -35,22 +35,22 @@ void getName(int num, char *name) {
 }
 
 /* Geração de código para criar uma função. Exemplo */
-void Funct(struct no* Funct, int Id, struct no Comandos) {
+void Funct(struct no* Funct, int Id, struct no Comandos) 
+{
 	create_cod(&Funct->code);
 	obtemNome(Id);
-	sprintf(instrucao,"%s:\n",nome);
-	insert_cod(&Funct->code,instrucao);
-	insert_cod(&Funct->code,Comandos.code);
-	if (strcmp(nome,"main")==0) {
-		sprintf(instrucao,"\tli $v0,10\n");
+	sprintf(instrucao, "%s:\n", nome);
+	insert_cod(&Funct->code, instrucao);
+	insert_cod(&Funct->code, Comandos.code);
+	if (strcmp(nome,"main")==0) 
+    {
+		sprintf(instrucao,"\tli $v0,10\n"); //Define exit
 		insert_cod(&Funct->code,instrucao);
-		sprintf(instrucao,"\tsyscall\n\n"); 
+		sprintf(instrucao,"\tsyscall\n\n"); //Call exit
 		insert_cod(&Funct->code,instrucao);					
-	}
-	else {
-		sprintf(instrucao,"\tjr $ra\n\n"); 
+	} else {
+		sprintf(instrucao,"\tjr $ra\n\n"); //Return to previous function
 		insert_cod(&Funct->code,instrucao);
-
 	}
 }
 
@@ -77,17 +77,9 @@ void Call(struct no* Call, int Id, struct ids* Args) {
     insert_cod(&Call->code, instrucao);
 }
 
-
-
 /* Geração de código para chamada de função sem argumentos */
-void Call_blank(struct no* Call, int Id) {
-    create_cod(&Call->code);
-    sprintf(instrucao, "\tjal %s\n", Tabela[Id].nome);
-    insert_cod(&Call->code, instrucao);
-    Call->place = newTemp();
-    char reg[5];
-    getName(Call->place, reg);
-    sprintf(instrucao, "\tmove %s, $v0\n", reg);
+void Call_blank(struct no* Call) {
+    sprintf(instrucao, "\tjal %s\n", nome);
     insert_cod(&Call->code, instrucao);
 }
 
@@ -98,14 +90,14 @@ char* get_place(int id) {
     return reg;
 }
 
-void Atrib(struct no *atr, int id, struct no exp) {
-    create_cod(&atr->code);
-    insert_cod(&atr->code, exp.code);     
-    char reg1[10], reg2[10], instrucao[100];
-    strcpy(reg1, get_place(id));
-    strcpy(reg2, get_place(exp.place));                 
-    sprintf(instrucao, "\tmove %s, %s\n", reg1, reg2);
-    insert_cod(&atr->code, instrucao);     
+void Atrib(struct no* atribuido, struct no exp){
+	char dest[5], source[5];
+	create_cod(&atribuido->code);
+	getName(atribuido->place, dest);
+	getName(exp.place, source);
+	sprintf(instrucao,"\tmove %s, %s\n", dest, source);
+	insert_cod(&atribuido->code, instrucao);
+	insert_cod(&atribuido->code, exp.code);
 }
 
 /* Geração de código para carregar constantes */
@@ -253,5 +245,29 @@ void DoWhile(struct no *DoWhile, struct no Body, struct no Exp) {
     insert_cod(&DoWhile->code, instrucao);
 }
 
+void adiciona_funcao_tabela(char *nome, int tipo, struct ids *parametros) 
+{
+    int pos;
+
+    pos = procura(nome);
+
+    if (pos == -1) 
+    {
+        pos = insere(nome);
+    }
+
+    set_type(pos, tipo);
+    if (parametros != NULL) 
+    {
+        Tabela[pos].tam_arg_list = parametros->tam;
+
+        for (int i = 0; i < parametros->tam; i++) 
+        {
+            Tabela[pos].arg_list[i] = parametros->ids[i];
+        }
+    } else {
+        Tabela[pos].tam_arg_list = 0; 
+    }
+}
 
 
